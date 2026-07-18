@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Big Cat A-Z Sentence Puzzle</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Arial Rounded MT Bold", Arial, sans-serif;
+      background: linear-gradient(180deg, #fff8ef 0%, #ffe8df 100%);
+      color: #2f2a28;
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px;
+      min-height: 100vh;
+    }
+
+    .hidden { display: none !important; }
+
+    .card {
+      background: #fff;
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+    }
+
+    .start-screen, .end-screen {
+      text-align: center;
+      padding: 36px 20px;
+    }
+
+    .hero {
+      font-size: 42px;
+      font-weight: 900;
+      color: #ff5b5b;
+      margin-bottom: 12px;
+    }
+
+    .sub {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .big-btn {
+      border: none;
+      border-radius: 22px;
+      padding: 18px 28px;
+      font-size: 24px;
+      font-weight: 900;
+      background: #ff5b5b;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #d94646;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .title {
+      font-size: 28px;
+      font-weight: 900;
+      color: #ff5b5b;
+    }
+
+    .progress {
+      background: #fff3c4;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: 900;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      gap: 18px;
+    }
+
+    .image-panel {
+      background: #fff7f3;
+      border-radius: 24px;
+      border: 3px solid #ffd8cb;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .letter-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 76px;
+      height: 76px;
+      padding: 0 16px;
+      border-radius: 22px;
+      background: #ff5b5b;
+      color: white;
+      font-size: 40px;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .image-wrap {
+      background: #fff;
+      min-height: 380px;
+      border-radius: 22px;
+      border: 2px dashed #ffb69b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 12px;
+    }
+
+    .image-wrap img {
+      max-width: 100%;
+      max-height: 560px;
+      object-fit: contain;
+      border-radius: 14px;
+    }
+
+    .puzzle-panel {
+      background: #fffdfa;
+      border-radius: 24px;
+      border: 3px solid #ffe2aa;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .section-title {
+      font-size: 19px;
+      font-weight: 900;
+      color: #ff7a3d;
+    }
+
+    .sentence-slots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-height: 78px;
+      padding: 14px;
+      background: #fff4d8;
+      border-radius: 18px;
+      border: 2px dashed #ffc85d;
+    }
+
+    .slot, .word-btn {
+      min-height: 50px;
+      padding: 10px 16px;
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 900;
+      user-select: none;
+    }
+
+    .slot {
+      min-width: 88px;
+      background: #fff;
+      border: 2px solid #ffd89c;
+    }
+
+    .slot.filled {
+      background: #ffffff;
+    }
+
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .word-btn {
+      border: none;
+      background: #8fdcff;
+      color: #17324a;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #58b7e7;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+
+    .word-btn:hover { transform: translateY(-2px); }
+    .word-btn:active { transform: translateY(1px); }
+
+    .word-btn.used {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .control-btn {
+      border: none;
+      border-radius: 16px;
+      padding: 12px 18px;
+      font-size: 17px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .gray   { background: #ececec; color: #333; }
+    .yellow { background: #ffd95f; color: #4f3d00; }
+    .mint   { background: #9ef1cb; color: #184d37; }
+    .pink   { background: #ff5b5b; color: #fff; }
+
+    .message {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      font-size: 24px;
+      font-weight: 900;
+      color: #ff5b5b;
+    }
+
+    .full-sentence {
+      min-height: 58px;
+      background: #f7fbff;
+      border: 2px solid #cfedff;
+      border-radius: 18px;
+      padding: 14px;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      font-size: 14px;
+      color: #6e615d;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .image-wrap {
+        min-height: 260px;
+      }
+
+      .slot, .word-btn {
+        font-size: 18px;
+      }
+
+      .hero {
+        font-size: 34px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div id="startScreen" class="card start-screen">
+      <div class="hero">🐱 Big Cat A–Z Sentence Puzzle</div>
+      <div class="sub">
+        그림을 보고 문장을 순서대로 눌러 완성해요.<br />
+        정답이면 영어 문장이 자동으로 재생돼요!
+      </div>
+      <button id="startBtn" class="big-btn">게임 시작</button>
+      <div class="footer-note">
+        이미지 파일은 <b>assets/01.png ~ assets/26.png</b> 로 넣어두면 자동 연결됩니다.
+      </div>
+    </div>
+
+    <div id="gameScreen" class="hidden">
+      <div class="topbar">
+        <div class="title">🐱 Big Cat Alphabet Puzzle</div>
+        <div id="progressText" class="progress">1 / 26</div>
+      </div>
+
+      <div class="card">
+        <div class="main-grid">
+          <div class="image-panel">
+            <div id="letterBadge" class="letter-badge">A</div>
+            <div class="image-wrap">
+              <img id="letterImage" src="" alt="alphabet image" />
+            </div>
+          </div>
+
+          <div class="puzzle-panel">
+            <div class="section-title">문장 완성하기</div>
+            <div id="sentenceSlots" class="sentence-slots"></div>
+
+            <div class="section-title">단어 버튼</div>
+            <div id="wordBank" class="word-bank"></div>
+
+            <div class="controls">
+              <button id="undoBtn" class="control-btn gray">한 칸 지우기</button>
+              <button id="resetBtn" class="control-btn yellow">처음부터</button>
+              <button id="listenBtn" class="control-btn mint">다시 듣기</button>
+              <button id="nextBtn" class="control-btn pink hidden">다음</button>
+            </div>
+
+            <div id="message" class="message"></div>
+            <div id="fullSentence" class="full-sentence"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        아이폰/아이패드는 첫 터치 후 음성 재생이 더 안정적입니다.
+      </div>
+    </div>
+
+    <div id="endScreen" class="card end-screen hidden">
+      <div class="hero">🎉 Great Job!</div>
+      <div class="sub">A–Z 문장 맞추기를 모두 끝냈어요.</div>
+      <button id="restartBtn" class="big-btn">다시 하기</button>
+    </div>
+  </div>
+
+  <script>
+    const DATA = [
+      { letter: "A", sentence: "All eyes on me.", image: "assets/01.png" },
+      { letter: "B", sentence: "Brush your teeth!", image: "assets/02.png" },
+      { letter: "C", sentence: "Careful!", image: "assets/03.png" },
+      { letter: "D", sentence: "Do not run.", image: "assets/04.png" },
+      { letter: "E", sentence: "Eat your veggies.", image: "assets/05.png" },
+      { letter: "F", sentence: "Five more minutes.", image: "assets/06.png" },
+      { letter: "G", sentence: "Got it?", image: "assets/07.png" },
+      { letter: "H", sentence: "How many times?", image: "assets/08.png" },
+      { letter: "I", sentence: "I'm watching you.", image: "assets/09.png" },
+      { letter: "J", sentence: "Just one bite.", image: "assets/10.png" },
+      { letter: "K", sentence: "Knock it off.", image: "assets/11.png" },
+      { letter: "L", sentence: "Look at this. Who did it?", image: "assets/12.png" },
+      { letter: "M", sentence: "Mommy will know.", image: "assets/13.png" },
+      { letter: "N", sentence: "No.", image: "assets/14.png" },
+      { letter: "O", sentence: "One more time.", image: "assets/15.png" },
+      { letter: "P", sentence: "Perfect! Let's do it!", image: "assets/16.png" },
+      { letter: "Q", sentence: "Quiet.", image: "assets/17.png" },
+      { letter: "R", sentence: "Really?", image: "assets/18.png" },
+      { letter: "S", sentence: "Stop talking.", image: "assets/19.png" },
+      { letter: "T", sentence: "Turn the page.", image: "assets/20.png" },
+      { letter: "U", sentence: "Use your words.", image: "assets/21.png" },
+      { letter: "V", sentence: "Veggies in your mouth!", image: "assets/22.png" },
+      { letter: "W", sentence: "What did I just say?", image: "assets/23.png" },
+      { letter: "X", sentence: "X marks the spot.", image: "assets/24.png" },
+      { letter: "Y", sentence: "You again?", image: "assets/25.png" },
+      { letter: "Z", sentence: "Zero patience left.", image: "assets/26.png" }
+    ];
+
+    const startScreen = document.getElementById("startScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const endScreen = document.getElementById("endScreen");
+
+    const startBtn = document.getElementById("startBtn");
+    const restartBtn = document.getElementById("restartBtn");
+
+    const progressText = document.getElementById("progressText");
+    const letterBadge = document.getElementById("letterBadge");
+    const letterImage = document.getElementById("letterImage");
+    const sentenceSlots = document.getElementById("sentenceSlots");
+    const wordBank = document.getElementById("wordBank");
+    const message = document.getElementById("message");
+    const fullSentence = document.getElementById("fullSentence");
+
+    const undoBtn = document.getElementById("undoBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const listenBtn = document.getElementById("listenBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    let currentIndex = 0;
+    let correctWords = [];
+    let selectedWords = [];
+    let currentButtons = [];
+
+    function shuffle(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function splitSentence(sentence) {
+      return sentence
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+    }
+
+    function normalizeWord(word) {
+      return word
+        .replace(/[.,!?]/g, "")
+        .trim()
+        .toLowerCase();
+    }
+
+    function normalizeSentence(text) {
+      return text
+        .replace(/[.,!?]/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase();
+    }
+
+    function speakCurrentSentence() {
+      const item = DATA[currentIndex];
+      const speechText = `${item.letter}. ${item.sentence}`;
+      speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(speechText);
+      utter.lang = "en-US";
+      utter.rate = 0.9;
+      utter.pitch = 1.03;
+      speechSynthesis.speak(utter);
+    }
+
+    function clearRoundUI() {
+      sentenceSlots.innerHTML = "";
+      wordBank.innerHTML = "";
+      message.textContent = "";
+      fullSentence.textContent = "";
+      nextBtn.classList.add("hidden");
+      selectedWords = [];
+      currentButtons = [];
+    }
+
+    function renderSlots() {
+      sentenceSlots.innerHTML = "";
+      for (let i = 0; i < correctWords.length; i++) {
+        const slot = document.createElement("div");
+        slot.className = "slot";
+        if (selectedWords[i]) {
+          slot.textContent = selectedWords[i];
+          slot.classList.add("filled");
+        } else {
+          slot.textContent = "___";
+        }
+        sentenceSlots.appendChild(slot);
+      }
+    }
+
+    function renderWordBank(words) {
+      wordBank.innerHTML = "";
+      currentButtons = [];
+
+      words.forEach((word, index) => {
+        const btn = document.createElement("button");
+        btn.className = "word-btn";
+        btn.textContent = word;
+        btn.dataset.word = word;
+        btn.dataset.index = String(index);
+        btn.addEventListener("click", () => handleWordClick(btn, word));
+        currentButtons.push(btn);
+        wordBank.appendChild(btn);
+      });
+    }
+
+    function handleWordClick(button, word) {
+      if (button.classList.contains("used")) return;
+      selectedWords.push(word);
+      button.classList.add("used");
+      renderSlots();
+      checkAnswerWhenReady();
+    }
+
+    function checkAnswerWhenReady() {
+      if (selectedWords.length !== correctWords.length) return;
+
+      const userAnswer = normalizeSentence(selectedWords.join(" "));
+      const correctAnswer = normalizeSentence(correctWords.join(" "));
+
+      if (userAnswer === correctAnswer) {
+        message.textContent = "🎉 Great job!";
+        fullSentence.textContent = `${DATA[currentIndex].letter}. ${DATA[currentIndex].sentence}`;
+        speakCurrentSentence();
+        nextBtn.classList.remove("hidden");
+      } else {
+        message.textContent = "❌ Try again!";
+        setTimeout(() => {
+          resetSelection();
+          message.textContent = "";
+        }, 800);
+      }
+    }
+
+    function resetSelection() {
+      selectedWords = [];
+      currentButtons.forEach(btn => btn.classList.remove("used"));
+      renderSlots();
+    }
+
+    function undoSelection() {
+      if (selectedWords.length === 0) return;
+
+      const removedWord = selectedWords.pop();
+      const targetNormalized = normalizeWord(removedWord);
+
+      for (let i = currentButtons.length - 1; i >= 0; i--) {
+        const btn = currentButtons[i];
+        if (
+          normalizeWord(btn.dataset.word) === targetNormalized &&
+          btn.classList.contains("used")
+        ) {
+          btn.classList.remove("used");
+          break;
+        }
+      }
+
+      renderSlots();
+    }
+
+    function loadQuestion() {
+      clearRoundUI();
+
+      const item = DATA[currentIndex];
+      correctWords = splitSentence(item.sentence);
+
+      progressText.textContent = `${currentIndex + 1} / ${DATA.length}`;
+      letterBadge.textContent = item.letter;
+      letterImage.src = item.image;
+      letterImage.alt = `${item.letter} image`;
+
+      renderSlots();
+      renderWordBank(shuffle(correctWords));
+
+      setTimeout(() => {
+        speakCurrentSentence();
+      }, 250);
+    }
+
+    function startGame() {
+      currentIndex = 0;
+      startScreen.classList.add("hidden");
+      endScreen.classList.add("hidden");
+      gameScreen.classList.remove("hidden");
+      loadQuestion();
+    }
+
+    function nextQuestion() {
+      currentIndex += 1;
+      if (currentIndex >= DATA.length) {
+        gameScreen.classList.add("hidden");
+        endScreen.classList.remove("hidden");
+        return;
+      }
+      loadQuestion();
+    }
+
+    startBtn.addEventListener("click", startGame);
+    restartBtn.addEventListener("click", startGame);
+    resetBtn.addEventListener("click", resetSelection);
+    undoBtn.addEventListener("click", undoSelection);
+    listenBtn.addEventListener("click", speakCurrentSentence);
+    nextBtn.addEventListener("click", nextQuestion);
+
+    letterImage.addEventListener("error", () => {
+      const current = DATA[currentIndex];
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="800" height="800">
+          <rect width="100%" height="100%" fill="#fff7f0"/>
+          <text x="50%" y="38%" text-anchor="middle" font-size="220" font-family="Arial" font-weight="bold" fill="#ff5b5b">${current.letter}</text>
+          <text x="50%" y="54%" text-anchor="middle" font-size="34" font-family="Arial" fill="#7d6b67">assets 폴더에 ${current.letter} 이미지를 넣어주세요</text>
+          <text x="50%" y="63%" text-anchor="middle" font-size="28" font-family="Arial" fill="#7d6b67">${current.sentence}</text>
+        </svg>
+      `;
+      letterImage.src = "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    });
+  </script>
+</body>
+</html>
